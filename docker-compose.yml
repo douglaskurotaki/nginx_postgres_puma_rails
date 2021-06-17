@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    image: nginx
+    volumes:
+     - ./templates:/etc/nginx/templates
+    ports:
+     - "80:80"
+    depends_on:
+      - app
+    environment:
+     - NGINX_HOST=foobar.com
+     - NGINX_PORT=80
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    ports:
+      - "5432"
+  app:
+    build: .
+    volumes:
+      - ./rails_app:/rails_app
+    # ports:
+    #   - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - RAILS_ENV=${RAILS_ENV}
